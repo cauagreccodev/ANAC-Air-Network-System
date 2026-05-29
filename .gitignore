@@ -1,0 +1,8 @@
+# Executáveis compilados
+*.exe
+
+# Artefatos de build
+*.o
+*.obj
+*.out
+system.exe

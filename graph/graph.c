@@ -16,8 +16,8 @@ int register_airport(Graph *graph, char *airport_name, char *city){
     if(graph->count >= MAX){
         return 0;
     }
-    strcpy(graph->vertex[graph->count].airport_name_vertex, airport_name);
-    strcpy(graph->vertex[graph->count].code_vertex, city);
+    strcpy(graph->vertex[graph->count].code_vertex, airport_name);
+    strcpy(graph->vertex[graph->count].airport_name_vertex, city);
     graph->count++;
     return 1;
 }
@@ -69,24 +69,67 @@ int remove_flight(Graph *graph, int target_id){
 }
 
 void list_flights(Graph *graph){
+    int has_flights = 0;
+
     for(int i = 0; i < graph->count; i++){
         NodeMatrix *p_current = graph->edge[i];
+
+        if(p_current == NULL){
+            continue;
+        }
+
+        has_flights = 1;
         printf("\n--- Flights departing from %s ---\n", graph->vertex[i].code_vertex);
+
         while(p_current != NULL){
-            printf("Destination: %s (Flight ID: %d)\n",graph->vertex[p_current->column].code_vertex,*(int*)p_current->data); //*(int*)transformacao do void pro int
+            printf("Destination: %s (Flight ID: %d)\n", graph->vertex[p_current->column].code_vertex, *(int*)p_current->data);
             p_current = p_current->next;
         }
+    }
+
+    if(has_flights == 0){
+        printf("\nNo flights registered.\n");
     }
 }
 
 int check_flight_ID(Graph *graph, int target_id){
-    for(int i = 0;i < graph->count;i++){
+    for(int i = 0; i < graph->count; i++){
         NodeMatrix *p_current = graph->edge[i];
         while(p_current != NULL){
             if(*(int*)p_current->data == target_id){
-                return 1; //nao e igual ao id unico
+                return 1;
             }
+            p_current = p_current->next;
         }
     }
-    return 0; //igual ao id unico
+    return 0;
+}
+
+void find_paths(Graph *graph, int current_vertex, int dest_vertex, int visited[], int path[], int path_index, int *found){
+    visited[current_vertex] = 1;
+    path[path_index] = current_vertex;
+    path_index++;
+
+    if(current_vertex == dest_vertex){
+        printf("\nRoute found: ");
+        for(int i = 0; i < path_index; i++){
+            printf("%s", graph->vertex[path[i]].code_vertex);
+            if(i < path_index - 1){
+                printf(" -> ");
+            }
+        }
+        printf("\n");
+        *found = 1;
+    }
+    else{
+        NodeMatrix *p_current = graph->edge[current_vertex];
+        while(p_current != NULL){
+            if(visited[p_current->column] == 0){
+                find_paths(graph, p_current->column, dest_vertex, visited, path, path_index, found);
+            }
+            p_current = p_current->next;
+        }
+    }
+
+    visited[current_vertex] = 0;
 }

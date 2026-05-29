@@ -27,4 +27,6 @@ void list_flights(Graph *graph);
 
 int check_flight_ID(Graph *graph, int target_id);
 
+void find_paths(Graph *graph, int current_vertex, int dest_vertex,int visited[], int path[], int path_index, int *found);
+
 #endif
