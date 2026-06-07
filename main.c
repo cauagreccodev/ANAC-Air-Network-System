@@ -4,18 +4,47 @@
 #include "sparse-matrix/sparse_matrix.h"
 #include "graph/graph.h"
 
+void populate_sample_data(Graph *airline_network){
+    register_airport(airline_network, "BSB", "Brasilia");
+    register_airport(airline_network, "CNF", "Belo_Horizonte");
+    register_airport(airline_network, "GIG", "Rio_de_Janeiro");
+    register_airport(airline_network, "GRU", "Guarulhos");
+    register_airport(airline_network, "SSA", "Salvador");
+
+    register_flight(airline_network, 107, "BSB", "SSA");
+    register_flight(airline_network, 555, "CNF", "GIG");
+    register_flight(airline_network, 101, "CNF", "GRU");
+    register_flight(airline_network, 214, "CNF", "SSA");
+    register_flight(airline_network, 50, "GIG", "BSB");
+    register_flight(airline_network, 554, "GIG", "CNF");
+    register_flight(airline_network, 90, "GIG", "GRU");
+    register_flight(airline_network, 102, "GRU", "CNF");
+    register_flight(airline_network, 89, "GRU", "GIG");
+    register_flight(airline_network, 215, "SSA", "GIG");
+}
+
 int main(){
     int opt = 0;
     int id = 0;
     char airport_initial_code[100];
     char airport_final_code[100];
+    char buffer[100];
+    char junk;
     Graph *airline_network = create_graph();
+
+    populate_sample_data(airline_network);
+    printf("Sample data loaded: 5 airports and 10 flights pre-registered.\n");
 
     while(opt != 6){
         printf("\nANAC AIR NETWORK SYSTEM\n");
         printf("\n [1] Register new Airport [2] Register flight [3] Remove flight [4] List flights [5] List possible routes [6] Exit program\n");
         printf("\n enter your option: ");
-        scanf("%d", &opt);
+        
+        if(scanf("%99s", buffer) != 1 || sscanf(buffer, "%d%c", &opt, &junk) != 1){
+            printf("\n-> Invalid input! Please type a number between 1 and 6.\n");
+            opt = 0;
+            continue;
+        }
 
         switch(opt){
             case 1:{
@@ -34,12 +63,22 @@ int main(){
             }
             case 2:{
                 printf("Enter the flight ID (number): ");
-                scanf("%d", &id);
+                if(scanf("%99s", buffer) != 1 || sscanf(buffer, "%d%c", &id, &junk) != 1){
+                    printf("\n-> Invalid input! Returning to menu.\n");
+                    break;
+                }
 
                 while(check_flight_ID(airline_network, id) == 1){
                     printf("\n-> Error: This ID already exists!\n");
                     printf("\nEnter a different flight ID: ");
-                    scanf("%d", &id);
+                    if(scanf("%99s", buffer) != 1 || sscanf(buffer, "%d%c", &id, &junk) != 1){
+                        printf("\n-> Invalid input! Returning to menu.\n");
+                        break;
+                    }
+                }
+
+                if(check_flight_ID(airline_network, id) == 1){
+                    break;
                 }
 
                 printf("Enter the Airport initial code: ");
@@ -58,7 +97,10 @@ int main(){
             }
             case 3:{
                 printf("\nSelect the flight ID to remove: ");
-                scanf("%d", &id);
+                if(scanf("%99s", buffer) != 1 || sscanf(buffer, "%d%c", &id, &junk) != 1){
+                    printf("\n-> Invalid input! Returning to menu.\n");
+                    break;
+                }
                 if(remove_flight(airline_network, id) == 1){
                     printf("\nFlight Removed!\n");
                 }
